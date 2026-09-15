@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-ink: #101a24;
+  --color-ink-deep: #0b131a;
+  --color-parchment: #f4efe4;
+  --color-parchment-dim: #cfc9bc;
+  --color-clay: #c97b4a;
+  --color-teal: #4f9c93;
+  --color-gold: #d6b25e;
+  --color-rose: #b86b7a;
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+}
+
+body {
+  font-family: var(--font-body), sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), serif;
+}
