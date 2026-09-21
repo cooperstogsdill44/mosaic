@@ -16,9 +16,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Mosaic — see how your information connects",
+  title: "Overt - see how your information connects",
   description:
-    "Mosaic shows students how separate pieces of information combine into a more identifiable picture, and what to do about it.",
+    "Overt shows how separate pieces of information combine into a more identifiable picture, and what to do about it.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

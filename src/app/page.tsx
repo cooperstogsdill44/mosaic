@@ -1,10 +1,11 @@
 import MosaicHero from "@/components/MosaicHero";
+import Link from "next/link";
 
 const workflow = [
   {
     color: "#C97B4A",
     word: "Discover",
-    body: "Identify the pieces of information that make up a student's public presence.",
+    body: "Identify the pieces of information that make up your public presence.",
   },
   {
     color: "#4F9C93",
@@ -27,10 +28,13 @@ export default function Home() {
   return (
     <div className="flex flex-col flex-1">
       <header className="flex items-center justify-between px-6 py-6 sm:px-12 sm:py-8">
-        <span className="font-display text-lg tracking-tight">Mosaic</span>
-        <span className="text-xs text-parchment-dim">
-          a student capstone project
-        </span>
+        <span className="font-display text-lg tracking-tight">Overt</span>
+        <Link
+          href="/live-demo"
+          className="text-sm text-parchment-dim hover:text-parchment transition-colors"
+        >
+          Try it live
+        </Link>
       </header>
 
       <main className="flex-1">
@@ -38,24 +42,26 @@ export default function Home() {
           <div className="mx-auto max-w-6xl grid gap-16 md:grid-cols-2 md:items-center">
             <div className="max-w-xl">
               <h1 className="font-display text-4xl sm:text-5xl leading-[1.1]">
-                Your information is harmless on its own. Combined, it isn&apos;t.
+                Your information is harmless on its own. Combined, it isn't.
               </h1>
               <p className="mt-6 text-base sm:text-lg text-parchment-dim leading-relaxed">
-                Mosaic shows high school students how scattered details — a
-                school, a hometown, a username — connect into a picture far
-                more identifiable than any single post. Then it helps you
-                take it apart.
+                Overt shows how scattered details - a school, a hometown, a
+                username - connect into a picture far more identifiable than
+                any single post. Then it helps you take it apart.
               </p>
-              <div className="mt-9 flex items-center gap-5">
+              <div className="mt-9 flex items-center gap-4 flex-wrap">
+                <Link
+                  href="/live-demo"
+                  className="inline-flex items-center rounded-md bg-parchment px-5 py-3 text-sm font-medium text-ink-deep hover:bg-parchment-dim transition-colors"
+                >
+                  Try it live
+                </Link>
                 <a
                   href="#workflow"
-                  className="inline-flex items-center rounded-md bg-parchment px-5 py-3 text-sm font-medium text-ink-deep hover:bg-parchment-dim transition-colors"
+                  className="inline-flex items-center rounded-md border border-white/15 px-5 py-3 text-sm font-medium text-parchment hover:border-white/30 transition-colors"
                 >
                   See how it works
                 </a>
-                <span className="text-sm text-parchment-dim">
-                  No sign-up needed to look around.
-                </span>
               </div>
             </div>
 
@@ -92,7 +98,7 @@ export default function Home() {
 
       <footer className="px-6 sm:px-12 py-8 border-t border-white/10 flex items-center justify-between">
         <span className="text-xs text-parchment-dim">
-          Mosaic — built for a high school capstone, {new Date().getFullYear()}.
+          Overt, {new Date().getFullYear()}.
         </span>
       </footer>
     </div>
