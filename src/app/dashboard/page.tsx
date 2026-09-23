@@ -3,25 +3,7 @@
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
-
-/* Colors: change these to retheme the whole dashboard. */
-const T = {
-  page: "#F5F6FB",
-  card: "#FFFFFF",
-  border: "#E4E7F1",
-  ink: "#1B2340",
-  muted: "#66708C",
-  nav: "#141B34",
-  navText: "#B9C0D8",
-  primary: "#5B5BD6",
-  high: "#E5484D",
-  medium: "#F5A524",
-  low: "#2FB67C",
-  indirect: "#B4BBD3",
-};
-
-const FOCUS =
-  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#5B5BD6]";
+import { T, FOCUS } from "../../lib/theme";
 
 /* ---------- Types ---------- */
 
@@ -42,7 +24,7 @@ const CATEGORIES: Category[] = [
   {
     id: "personal",
     label: "Personal info",
-    color: "#7C5CE0",
+    color: T.violet,
     side: "left",
     y: 140,
     items: [
@@ -56,7 +38,7 @@ const CATEGORIES: Category[] = [
   {
     id: "accounts",
     label: "Online accounts",
-    color: "#F59E0B",
+    color: T.gold,
     side: "left",
     y: 400,
     items: [
@@ -69,7 +51,7 @@ const CATEGORIES: Category[] = [
   {
     id: "school",
     label: "School",
-    color: "#2FB67C",
+    color: T.clay,
     side: "right",
     y: 100,
     items: [
@@ -81,7 +63,7 @@ const CATEGORIES: Category[] = [
   {
     id: "social",
     label: "Social media",
-    color: "#3B82F6",
+    color: T.rose,
     side: "right",
     y: 270,
     items: [
@@ -94,7 +76,7 @@ const CATEGORIES: Category[] = [
   {
     id: "location",
     label: "Location",
-    color: "#E0457B",
+    color: T.teal,
     side: "right",
     y: 440,
     items: [
@@ -241,17 +223,17 @@ const SOURCES = [
 const STREAK = { days: 14, week: [true, true, true, true, true, true, false], letters: ["M", "T", "W", "T", "F", "S", "S"] };
 
 const RISK: Record<Risk, { label: string; color: string; bg: string; text: string }> = {
-  high: { label: "High", color: T.high, bg: "#FDECEC", text: "#C62A2F" },
-  medium: { label: "Medium", color: T.medium, bg: "#FEF3DC", text: "#9A5B00" },
-  low: { label: "Low", color: T.low, bg: "#E4F6EE", text: "#1F7A54" },
+  high: { label: "High", color: T.high, bg: "rgba(229,87,79,0.16)", text: T.highText },
+  medium: { label: "Medium", color: T.medium, bg: "rgba(240,162,59,0.16)", text: T.mediumText },
+  low: { label: "Low", color: T.low, bg: "rgba(93,187,122,0.16)", text: T.lowText },
 };
 
 const KIND: Record<Kind, { label: string; color: string; hint: string }> = {
-  exact: { label: "Exact match", color: T.high, hint: "The same detail appears in more than one place." },
-  partial: { label: "Partial match", color: T.medium, hint: "Similar details that probably belong to the same person." },
+  exact: { label: "Exact match", color: T.gold, hint: "The same detail appears in more than one place." },
+  partial: { label: "Partial match", color: T.teal, hint: "Similar details that probably belong to the same person." },
   implied: {
     label: "Implied link",
-    color: T.primary,
+    color: T.rose,
     hint: "No text matches, but together the details narrow down who you are.",
   },
 };
@@ -277,9 +259,9 @@ const PAGES: { id: PageId; label: string; title: string; subtitle: string }[] = 
 /* ---------- Helpers ---------- */
 
 function getBand(score: number): { label: string; color: string; text: string } {
-  if (score <= 30) return { label: "Low exposure", color: T.low, text: "#1F7A54" };
-  if (score <= 60) return { label: "Moderate exposure", color: T.medium, text: "#9A5B00" };
-  return { label: "High exposure", color: T.high, text: "#C62A2F" };
+  if (score <= 30) return { label: "Low exposure", color: T.low, text: T.lowText };
+  if (score <= 60) return { label: "Moderate exposure", color: T.medium, text: T.mediumText };
+  return { label: "High exposure", color: T.high, text: T.highText };
 }
 
 function catLabel(id: CatId): string {
@@ -316,7 +298,7 @@ function Stat({ label, value, note, valueColor }: { label: string; value: string
       <p className="text-sm font-medium" style={{ color: T.muted }}>
         {label}
       </p>
-      <p className="mt-3 text-4xl font-semibold" style={{ color: valueColor ?? T.ink }}>
+      <p className="font-display mt-3 text-4xl font-medium" style={{ color: valueColor ?? T.text }}>
         {value}
       </p>
       <p className="mt-1 text-sm" style={{ color: T.muted }}>
@@ -340,7 +322,7 @@ function Gauge({ score, color }: { score: number; color: string }) {
         strokeLinecap="round"
         strokeDasharray={`${(len * score) / 100} ${len}`}
       />
-      <text x={100} y={92} textAnchor="middle" fontSize={38} fontWeight={700} fill={T.ink}>
+      <text x={100} y={92} textAnchor="middle" fontSize={38} fontWeight={600} fill={T.text} style={{ fontFamily: "var(--font-display), serif" }}>
         {score}
       </text>
       <text x={100} y={113} textAnchor="middle" fontSize={12} fill={T.muted}>
@@ -397,7 +379,7 @@ function TrendChart({
       {points.map((p, i) => (
         <g key={`${p.label}-${i}`}>
           <circle cx={px(i)} cy={py(p.value)} r={4.5} fill={T.card} stroke={color} strokeWidth={2.5} />
-          <text x={px(i)} y={py(p.value) - 11} textAnchor="middle" fontSize={12} fontWeight={600} fill={T.ink}>
+          <text x={px(i)} y={py(p.value) - 11} textAnchor="middle" fontSize={12} fontWeight={600} fill={T.text}>
             {p.value}
           </text>
           <text x={px(i)} y={height - 9} textAnchor="middle" fontSize={12} fill={T.muted}>
@@ -428,12 +410,12 @@ function ActionRow({
         checked={checked}
         onChange={onToggle}
         className={`mt-0.5 h-5 w-5 shrink-0 cursor-pointer ${FOCUS}`}
-        style={{ accentColor: T.primary }}
+        style={{ accentColor: T.teal }}
       />
       <label htmlFor={`rec-${compact ? "c-" : ""}${rec.id}`} className="flex-1 cursor-pointer">
         <span
           className={`block text-sm font-medium ${checked ? "line-through" : ""}`}
-          style={{ color: checked ? T.muted : T.ink }}
+          style={{ color: checked ? T.muted : T.text }}
         >
           {rec.title}
         </span>
@@ -446,7 +428,7 @@ function ActionRow({
       <div className="shrink-0 text-right">
         <Chip risk={rec.impact >= 7 ? "high" : "medium"}>{rec.impact >= 7 ? "High impact" : "Medium impact"}</Chip>
         {!compact && (
-          <p className="mt-1 text-sm" style={{ color: checked ? T.low : T.muted }}>
+          <p className="mt-1 text-sm" style={{ color: checked ? T.lowText : T.muted }}>
             -{rec.impact} points
           </p>
         )}
@@ -551,7 +533,7 @@ function FootprintMap({ active, animate }: { active: Connection; animate: boolea
                 />
                 <rect x={x0} y={ly - 12} width={w} height={24} rx={12} fill={T.card} stroke={T.border} />
                 <circle cx={x0 + 13} cy={ly} r={4.5} fill={RISK[item.risk].color} />
-                <text x={x0 + 24} y={ly + 4} fontSize={12} fill={T.ink}>
+                <text x={x0 + 24} y={ly + 4} fontSize={12} fill={T.text}>
                   {item.label}
                 </text>
               </g>
@@ -567,7 +549,7 @@ function FootprintMap({ active, animate }: { active: Connection; animate: boolea
             <g key={c.id}>
               {on && <circle cx={p.x} cy={p.y} r={35} fill="none" stroke={kindColor} strokeWidth={3} />}
               <circle cx={p.x} cy={p.y} r={28} fill={c.color} />
-              <text x={p.x} y={p.y + 6} textAnchor="middle" fontSize={17} fontWeight={700} fill="#fff">
+              <text x={p.x} y={p.y + 6} textAnchor="middle" fontSize={17} fontWeight={700} fill={T.deep}>
                 {c.items.length}
               </text>
               <text
@@ -576,7 +558,7 @@ function FootprintMap({ active, animate }: { active: Connection; animate: boolea
                 textAnchor="middle"
                 fontSize={13}
                 fontWeight={600}
-                fill={T.ink}
+                fill={T.text}
                 stroke={T.card}
                 strokeWidth={4}
                 paintOrder="stroke"
@@ -588,8 +570,8 @@ function FootprintMap({ active, animate }: { active: Connection; animate: boolea
         })}
 
         {/* you */}
-        <circle cx={CX} cy={CY} r={46} fill={T.nav} />
-        <text x={CX} y={CY + 7} textAnchor="middle" fontSize={20} fontWeight={700} fill="#fff">
+        <circle cx={CX} cy={CY} r={46} fill={T.deep} stroke={T.border} strokeWidth={2} />
+        <text x={CX} y={CY + 7} textAnchor="middle" fontSize={20} fontWeight={600} fill={T.text} style={{ fontFamily: "var(--font-display), serif" }}>
           YOU
         </text>
       </svg>
@@ -629,22 +611,22 @@ export default function DashboardPage() {
   const title = page === "dashboard" && name ? `Welcome back, ${name}` : meta.title;
 
   const streakCard = (
-    <section className="rounded-xl p-5" style={{ background: T.nav, color: "#fff" }}>
-      <h2 className="text-lg font-semibold">Privacy streak</h2>
-      <p className="mt-3 text-4xl font-semibold">{STREAK.days} days</p>
-      <p className="mt-1 text-sm" style={{ color: T.navText }}>
+    <section className="rounded-xl border p-5" style={{ background: T.deep, borderColor: T.border, color: T.text }}>
+      <h2 className="font-display text-xl font-medium">Privacy streak</h2>
+      <p className="font-display mt-3 text-4xl font-medium">{STREAK.days} days</p>
+      <p className="mt-1 text-sm" style={{ color: T.dim }}>
         Great work staying consistent.
       </p>
       <ul className="mt-4 flex justify-between" aria-label="This week">
         {STREAK.letters.map((l, i) => (
-          <li key={i} className="flex flex-col items-center gap-1.5 text-xs" style={{ color: T.navText }}>
+          <li key={i} className="flex flex-col items-center gap-1.5 text-xs" style={{ color: T.dim }}>
             {l}
             <span
               className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
               style={{
                 background: STREAK.week[i] ? T.low : "transparent",
-                border: STREAK.week[i] ? "none" : `1.5px solid ${T.navText}`,
-                color: "#fff",
+                border: STREAK.week[i] ? "none" : `1.5px solid ${T.dim}`,
+                color: T.deep,
               }}
             >
               {STREAK.week[i] ? "✓" : ""}
@@ -657,23 +639,23 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="min-h-screen lg:flex" style={{ background: T.page, color: T.ink }}>
+    <div className="min-h-screen lg:flex" style={{ background: T.page, color: T.text }}>
       {/* Sidebar (desktop) */}
-      <aside className="hidden w-60 shrink-0 flex-col p-5 lg:flex" style={{ background: T.nav }}>
-        <div className="flex items-center gap-3">
+      <aside className="hidden w-60 shrink-0 flex-col p-5 lg:flex" style={{ background: T.deep }}>
+        <Link href="/" aria-label="Overt home" className={`flex items-center gap-3 ${FOCUS}`}>
           <span className="grid h-8 w-8 grid-cols-2 gap-0.5" aria-hidden="true">
-            <span className="rounded-sm" style={{ background: T.primary }} />
-            <span className="rounded-sm" style={{ background: T.low }} />
-            <span className="rounded-sm" style={{ background: T.medium }} />
-            <span className="rounded-sm" style={{ background: T.high }} />
+            <span className="rounded-sm" style={{ background: T.clay }} />
+            <span className="rounded-sm" style={{ background: T.teal }} />
+            <span className="rounded-sm" style={{ background: T.gold }} />
+            <span className="rounded-sm" style={{ background: T.rose }} />
           </span>
           <div>
-            <p className="text-lg font-semibold leading-tight text-white">Overt</p>
-            <p className="text-xs" style={{ color: T.navText }}>
+            <p className="font-display text-xl leading-tight text-parchment">Overt</p>
+            <p className="text-xs" style={{ color: T.dim }}>
               See the whole picture
             </p>
           </div>
-        </div>
+        </Link>
 
         <nav aria-label="Dashboard pages" className="mt-8 flex flex-col gap-1">
           {PAGES.map((p) => {
@@ -684,7 +666,7 @@ export default function DashboardPage() {
                 onClick={() => setPage(p.id)}
                 aria-current={on ? "page" : undefined}
                 className={`rounded-lg px-4 py-2.5 text-left text-sm font-medium ${on ? "" : "hover:bg-white/10"} ${FOCUS}`}
-                style={{ background: on ? T.primary : "transparent", color: on ? "#fff" : T.navText }}
+                style={{ background: on ? "rgba(244,239,228,0.12)" : "transparent", color: on ? T.text : T.dim }}
               >
                 {p.label}
               </button>
@@ -692,8 +674,28 @@ export default function DashboardPage() {
           })}
         </nav>
 
-        <div className="mt-auto rounded-lg p-4 text-sm" style={{ background: "rgba(255,255,255,0.06)", color: T.navText }}>
-          <p className="font-medium text-white">Privacy tip</p>
+        <div className="mt-6 border-t pt-4" style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+          <p className="px-4 pb-2 text-xs" style={{ color: T.dim }}>
+            Website
+          </p>
+          <Link
+            href="/"
+            className={`block rounded-lg px-4 py-2 text-sm font-medium hover:bg-white/10 ${FOCUS}`}
+            style={{ color: T.dim }}
+          >
+            Home
+          </Link>
+          <Link
+            href="/live-demo"
+            className={`block rounded-lg px-4 py-2 text-sm font-medium hover:bg-white/10 ${FOCUS}`}
+            style={{ color: T.dim }}
+          >
+            Try it live
+          </Link>
+        </div>
+
+        <div className="mt-auto rounded-lg p-4 text-sm" style={{ background: "rgba(255,255,255,0.06)", color: T.dim }}>
+          <p className="font-medium text-parchment">Privacy tip</p>
           <p className="mt-2">A username you reuse is a thread anyone can pull. Use a different one for each place.</p>
         </div>
       </aside>
@@ -703,7 +705,7 @@ export default function DashboardPage() {
         <nav
           aria-label="Dashboard pages"
           className="flex gap-1 overflow-x-auto px-4 py-3 lg:hidden"
-          style={{ background: T.nav }}
+          style={{ background: T.deep }}
         >
           {PAGES.map((p) => {
             const on = page === p.id;
@@ -713,18 +715,32 @@ export default function DashboardPage() {
                 onClick={() => setPage(p.id)}
                 aria-current={on ? "page" : undefined}
                 className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium ${FOCUS}`}
-                style={{ background: on ? T.primary : "transparent", color: on ? "#fff" : T.navText }}
+                style={{ background: on ? "rgba(244,239,228,0.12)" : "transparent", color: on ? T.text : T.dim }}
               >
                 {p.label}
               </button>
             );
           })}
+          <Link
+            href="/"
+            className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium ${FOCUS}`}
+            style={{ color: T.dim }}
+          >
+            Home
+          </Link>
+          <Link
+            href="/live-demo"
+            className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium ${FOCUS}`}
+            style={{ color: T.dim }}
+          >
+            Try it live
+          </Link>
         </nav>
 
         <main className="mx-auto max-w-[1200px] px-5 py-6 lg:px-8">
           <header className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-semibold">{title}</h1>
+              <h1 className="font-display text-3xl font-medium">{title}</h1>
               <p className="mt-1 text-sm" style={{ color: T.muted }}>
                 {meta.subtitle}
               </p>
@@ -735,8 +751,7 @@ export default function DashboardPage() {
               </span>
               <Link
                 href="/live-demo"
-                className={`rounded-lg px-4 py-2 text-sm font-medium text-white ${FOCUS}`}
-                style={{ background: T.primary }}
+                className={`rounded-lg bg-parchment px-4 py-2 text-sm font-medium text-ink-deep transition-colors hover:bg-parchment-dim ${FOCUS}`}
               >
                 Run a new audit
               </Link>
@@ -767,7 +782,7 @@ export default function DashboardPage() {
                   <Card>
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div className="max-w-md">
-                        <h2 className="text-lg font-semibold">Your footprint map</h2>
+                        <h2 className="font-display text-xl font-medium">Your footprint map</h2>
                         <p className="mt-1 text-sm" style={{ color: T.muted }}>
                           Each group holds details about you. Dashed lines show how groups can be linked to identify
                           you.
@@ -793,7 +808,7 @@ export default function DashboardPage() {
                   </Card>
 
                   <Card>
-                    <h2 className="text-lg font-semibold">Connection details</h2>
+                    <h2 className="font-display text-xl font-medium">Connection details</h2>
                     <p className="mt-1 text-sm" style={{ color: T.muted }}>
                       Select one to see it on the map.
                     </p>
@@ -807,7 +822,7 @@ export default function DashboardPage() {
                               aria-pressed={on}
                               className={`w-full rounded-lg p-3 text-left ${FOCUS}`}
                               style={{
-                                background: on ? "#EEF0FF" : T.page,
+                                background: on ? "rgba(244,239,228,0.08)" : T.inset,
                                 borderLeft: `4px solid ${KIND[c.kind].color}`,
                               }}
                             >
@@ -823,7 +838,7 @@ export default function DashboardPage() {
                     <button
                       onClick={() => setPage("connections")}
                       className={`mt-4 text-sm font-medium underline underline-offset-4 ${FOCUS}`}
-                      style={{ color: T.primary }}
+                      style={{ color: T.gold }}
                     >
                       View full connection analysis
                     </button>
@@ -832,17 +847,17 @@ export default function DashboardPage() {
 
                 <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
                   <Card>
-                    <h2 className="text-lg font-semibold">Footprint over time</h2>
+                    <h2 className="font-display text-xl font-medium">Footprint over time</h2>
                     <div className="mt-3">
                       <TrendChart points={points} color={band.color} width={360} height={220} />
                     </div>
-                    <p className="mt-2 text-sm font-medium" style={{ color: delta > 0 ? "#1F7A54" : T.muted }}>
+                    <p className="mt-2 text-sm font-medium" style={{ color: delta > 0 ? T.lowText : T.muted }}>
                       {delta > 0 ? `Down ${delta} points since your first audit` : "No change since your first audit"}
                     </p>
                   </Card>
 
                   <Card>
-                    <h2 className="text-lg font-semibold">Top risk factors</h2>
+                    <h2 className="font-display text-xl font-medium">Top risk factors</h2>
                     <ul className="mt-2">
                       {RISKS.map((r) => (
                         <li
@@ -858,14 +873,14 @@ export default function DashboardPage() {
                     <button
                       onClick={() => setPage("recommendations")}
                       className={`mt-3 text-sm font-medium underline underline-offset-4 ${FOCUS}`}
-                      style={{ color: T.primary }}
+                      style={{ color: T.gold }}
                     >
                       See how to fix them
                     </button>
                   </Card>
 
                   <Card>
-                    <h2 className="text-lg font-semibold">Recommended actions</h2>
+                    <h2 className="font-display text-xl font-medium">Recommended actions</h2>
                     <ul className="mt-2">
                       {sortedRecs.slice(0, 4).map((r) => (
                         <ActionRow key={r.id} rec={r} checked={done.includes(r.id)} onToggle={() => toggle(r.id)} compact />
@@ -874,7 +889,7 @@ export default function DashboardPage() {
                     <button
                       onClick={() => setPage("recommendations")}
                       className={`mt-3 text-sm font-medium underline underline-offset-4 ${FOCUS}`}
-                      style={{ color: T.primary }}
+                      style={{ color: T.gold }}
                     >
                       View all recommendations
                     </button>
@@ -885,7 +900,7 @@ export default function DashboardPage() {
                     <button
                       onClick={() => setPage("progress")}
                       className={`mt-3 text-sm font-medium underline underline-offset-4 ${FOCUS}`}
-                      style={{ color: T.primary }}
+                      style={{ color: T.gold }}
                     >
                       View progress
                     </button>
@@ -964,14 +979,14 @@ export default function DashboardPage() {
               <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
                 <div className="space-y-5">
                   <Card>
-                    <h2 className="text-lg font-semibold">Score over time</h2>
+                    <h2 className="font-display text-xl font-medium">Score over time</h2>
                     <p className="mb-3 mt-1 text-sm" style={{ color: T.muted }}>
                       Dashed lines mark the edges of the low and moderate ranges. Lower is safer.
                     </p>
                     <TrendChart points={points} color={band.color} />
                   </Card>
                   <Card>
-                    <h2 className="text-lg font-semibold">Audit history</h2>
+                    <h2 className="font-display text-xl font-medium">Audit history</h2>
                     <table className="mt-3 w-full text-left text-sm">
                       <thead>
                         <tr style={{ color: T.muted }}>
@@ -993,7 +1008,7 @@ export default function DashboardPage() {
                             <tr key={`${p.label}-${i}`} className="border-t" style={{ borderColor: T.border }}>
                               <td className="py-2.5">{p.label === "Now" ? "Now (after your actions)" : p.label}</td>
                               <td className="py-2.5 font-medium">{p.value}</td>
-                              <td className="py-2.5" style={{ color: change && change > 0 ? "#1F7A54" : T.muted }}>
+                              <td className="py-2.5" style={{ color: change && change > 0 ? T.lowText : T.muted }}>
                                 {change === null ? "First audit" : change > 0 ? `Down ${change}` : "No change"}
                               </td>
                             </tr>
@@ -1023,7 +1038,7 @@ export default function DashboardPage() {
                       onChange={(e) => setSettings((s) => ({ ...s, name: e.target.value }))}
                       placeholder="First name or nickname"
                       className={`mt-2 w-full rounded-lg border px-3 py-2 ${FOCUS}`}
-                      style={{ borderColor: T.border, background: T.card, color: T.ink }}
+                      style={{ borderColor: T.border, background: T.inset, color: T.text }}
                     />
                     <p className="mt-2 text-sm" style={{ color: T.muted }}>
                       Only used for the greeting on the dashboard. A nickname works fine.
@@ -1037,7 +1052,7 @@ export default function DashboardPage() {
                       checked={settings.reduceMotion}
                       onChange={(e) => setSettings((s) => ({ ...s, reduceMotion: e.target.checked }))}
                       className={`mt-1 h-5 w-5 ${FOCUS}`}
-                      style={{ accentColor: T.primary }}
+                      style={{ accentColor: T.teal }}
                     />
                     <label htmlFor="reduce-motion" className="cursor-pointer">
                       <span className="block text-sm font-medium">Reduce motion</span>
@@ -1068,16 +1083,16 @@ export default function DashboardPage() {
                 </Card>
 
                 <Card>
-                  <h2 className="text-lg font-semibold">Data sources</h2>
+                  <h2 className="font-display text-xl font-medium">Data sources</h2>
                   <p className="mt-1 text-sm" style={{ color: T.muted }}>
                     Overt combines these to build your score. Only the manual audit is live right now.
                   </p>
                   <ul className="mt-4 space-y-3">
                     {SOURCES.map((s) => (
-                      <li key={s.id} className="rounded-lg p-4" style={{ background: T.page }}>
+                      <li key={s.id} className="rounded-lg p-4" style={{ background: T.inset }}>
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <p className="text-sm font-semibold">{s.name}</p>
-                          <span className="flex items-center gap-2 text-sm" style={{ color: s.ok ? "#1F7A54" : T.muted }}>
+                          <span className="flex items-center gap-2 text-sm" style={{ color: s.ok ? T.lowText : T.muted }}>
                             <span
                               className="inline-block h-2 w-2 rounded-full"
                               style={{ background: s.ok ? T.low : T.indirect }}
@@ -1092,7 +1107,7 @@ export default function DashboardPage() {
                           <Link
                             href={s.href}
                             className={`mt-2 inline-block text-sm font-medium underline underline-offset-4 ${FOCUS}`}
-                            style={{ color: T.primary }}
+                            style={{ color: T.gold }}
                           >
                             {s.cta}
                           </Link>

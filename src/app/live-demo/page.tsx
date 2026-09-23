@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import { T } from "../../lib/theme";
 
 type Field =
   | "school"
@@ -57,14 +59,17 @@ const TYPE_COLOR: Record<ConnectionType, string> = {
   implied: "#B86B7A",
 };
 
-const TYPE_LABEL: Record<ConnectionType, string> = {
-  exact: "identical value",
-  partial: "reused value",
-  implied: "implied together",
-};
+const FOCUS =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold";
 
 function normalize(v: string) {
   return v.trim().toLowerCase();
+}
+
+function getBand(score: number): { label: string; text: string } {
+  if (score <= 30) return { label: "Low exposure", text: T.lowText };
+  if (score <= 60) return { label: "Moderate exposure", text: T.mediumText };
+  return { label: "High exposure", text: T.highText };
 }
 
 // specific field pairs that are risky together even with completely
@@ -157,7 +162,8 @@ function scoreProfile(profile: Partial<Record<Field, string>>, connections: Conn
     });
   }
 
-  const score = items.reduce((sum, r) => sum + r.points, 0);
+  // keep the score on the same 0-100 scale the dashboard uses
+  const score = Math.min(100, items.reduce((sum, r) => sum + r.points, 0));
   return { score, items };
 }
 
@@ -202,6 +208,7 @@ export default function LiveDemoPage() {
   const connections = submitted ? detectConnections(profile) : [];
   const { score, items } = submitted ? scoreProfile(profile, connections) : { score: 0, items: [] };
   const recommendations = submitted ? recommendationsFor(connections) : [];
+  const band = getBand(score);
 
   const filledFields = (Object.keys(profile) as Field[]).filter((f) => profile[f].trim());
 
@@ -242,10 +249,10 @@ export default function LiveDemoPage() {
   });
 
   return (
-    <div className="min-h-screen bg-ink text-parchment px-6 py-12 sm:px-12">
+    <div className="flex-1 bg-ink text-parchment px-6 py-12 sm:px-12">
       <div className="mx-auto max-w-6xl">
-        <h1 className="font-display text-3xl mb-2">Try it live</h1>
-        <p className="text-parchment-dim mb-10 max-w-xl">
+        <h1 className="font-display text-3xl sm:text-4xl mb-3">Try it live</h1>
+        <p className="text-parchment-dim mb-10 max-w-xl leading-relaxed">
           Fill in a few things about a fictional profile below - nothing here
           is sent anywhere, it all runs in your browser. Submit to watch how
           separate fields connect, then hover a dot for detail.
@@ -255,10 +262,11 @@ export default function LiveDemoPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {(Object.keys(FIELD_LABELS) as Field[]).map((field) => (
               <div key={field}>
-                <label className="block text-sm text-parchment-dim mb-1">
+                <label htmlFor={`field-${field}`} className="block text-sm text-parchment-dim mb-1">
                   {FIELD_LABELS[field]}
                 </label>
                 <input
+                  id={`field-${field}`}
                   type="text"
                   value={profile[field]}
                   onChange={(e) => {
@@ -266,21 +274,26 @@ export default function LiveDemoPage() {
                     setRevealed(false);
                     setProfile((p) => ({ ...p, [field]: e.target.value }));
                   }}
-                  className="w-full rounded-md bg-[#1B2733] border border-white/10 px-3 py-2 text-sm outline-none focus:border-white/30 transition-colors"
+                  className="w-full rounded-md bg-[#1B2733] border border-white/10 px-3 py-2 text-sm outline-none focus:border-gold/70 focus:ring-1 focus:ring-gold/40 transition-colors"
                   placeholder={`e.g. ${PLACEHOLDERS[field]}`}
                 />
               </div>
             ))}
             <button
               type="submit"
-              className="mt-4 rounded-md bg-parchment px-5 py-3 text-sm font-medium text-ink-deep hover:bg-parchment-dim transition-colors"
+              className={`mt-4 rounded-md bg-parchment px-5 py-3 text-sm font-medium text-ink-deep hover:bg-parchment-dim transition-colors ${FOCUS}`}
             >
               Map my connections
             </button>
           </form>
 
           <div>
-            <svg viewBox="0 0 340 340" className="w-full max-w-[360px] mx-auto">
+            <svg
+              viewBox="0 0 340 340"
+              className="w-full max-w-[360px] mx-auto"
+              role="img"
+              aria-label="Map of how the details you entered connect to each other"
+            >
               {submitted &&
                 connections.map((c, i) => {
                   const p1 = positions[c.a];
@@ -369,17 +382,24 @@ export default function LiveDemoPage() {
               })}
 
               {!submitted && filledFields.length === 0 && (
-                <text x="170" y="170" textAnchor="middle" fontSize="12" fill="#6b7580">
+                <text x="170" y="170" textAnchor="middle" fontSize="12" fill="#98A3AD">
                   Fill in the form to see the map
                 </text>
               )}
             </svg>
 
             {submitted && (
-              <div className="mt-6 space-y-6">
-                <div>
-                  <p className="font-display text-xl">Exposure score: {score}</p>
-                  <ul className="mt-3 space-y-2 text-sm text-parchment-dim">
+              <div className="mt-6 space-y-5">
+                <div className="rounded-xl border border-white/10 bg-[#16222E] p-5">
+                  <p className="text-sm text-parchment-dim">Exposure score</p>
+                  <p className="mt-1 flex items-baseline gap-3">
+                    <span className="font-display text-5xl">{score}</span>
+                    <span className="text-sm text-parchment-dim">out of 100</span>
+                  </p>
+                  <p className="mt-1 text-sm font-medium" style={{ color: band.text }}>
+                    {band.label}
+                  </p>
+                  <ul className="mt-4 space-y-2 text-sm text-parchment-dim">
                     {items.map((r, i) => (
                       <li key={i}>+ {r.points}: {r.reason}</li>
                     ))}
@@ -388,7 +408,7 @@ export default function LiveDemoPage() {
                 </div>
 
                 {recommendations.length > 0 && (
-                  <div>
+                  <div className="rounded-xl border border-white/10 bg-[#16222E] p-5">
                     <p className="font-display text-lg mb-2">Recommendations</p>
                     <ol className="space-y-2 text-sm text-parchment-dim list-decimal list-inside">
                       {recommendations.map((r, i) => (
@@ -397,6 +417,20 @@ export default function LiveDemoPage() {
                     </ol>
                   </div>
                 )}
+
+                <div className="rounded-xl border border-white/10 p-5">
+                  <p className="font-display text-lg">Keep track of your progress</p>
+                  <p className="mt-1 text-sm text-parchment-dim leading-relaxed">
+                    The dashboard shows a sample profile, so you can see what tracking your score over time looks
+                    like.
+                  </p>
+                  <Link
+                    href="/dashboard"
+                    className={`mt-4 inline-flex items-center rounded-md bg-parchment px-5 py-3 text-sm font-medium text-ink-deep hover:bg-parchment-dim transition-colors ${FOCUS}`}
+                  >
+                    Open the dashboard
+                  </Link>
+                </div>
               </div>
             )}
           </div>

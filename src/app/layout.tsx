@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
+import SiteHeader from "../components/SiteHeader";
+
 
 const fraunces = Fraunces({
   variable: "--font-display",
